@@ -85,7 +85,8 @@ class User
         }
 
         // Print error if something goes wrong
-        printf("Error: %s.\n", $stmt->error);
+        $errorInfo = $stmt->errorInfo();
+        printf("Error: %s.\n", $errorInfo[2]);
 
         return false;
     }

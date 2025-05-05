@@ -18,12 +18,12 @@ try {
 
         // Add note
         if ($action === 'add_note') {
-            $prospect_id = filter_input(INPUT_POST, 'prospect_id', FILTER_VALIDATE_INT) ?? 0;
+            $prospect_id = filter_input(INPUT_POST, 'prospect_id', FILTER_VALIDATE_INT);
             $content = filter_input(INPUT_POST, 'content', FILTER_SANITIZE_STRING);
 
-            if (empty($content)) {
+            if (!$prospect_id || empty($content)) {
                 header('Content-Type: application/json');
-                echo json_encode(['error' => 'Note content is required']);
+                echo json_encode(['error' => 'Invalid input. Prospect ID and content are required.']);
                 exit;
             }
 
@@ -50,18 +50,18 @@ try {
                 echo json_encode(['success' => true, 'html' => $html]);
             } else {
                 header('Content-Type: application/json');
-                echo json_encode(['error' => 'Failed to add note']);
+                echo json_encode(['error' => 'Failed to add note.']);
             }
             exit;
         }
 
         // Delete note
         if ($action === 'delete_note') {
-            $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?? 0;
+            $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 
-            if ($id <= 0) {
+            if (!$id) {
                 header('Content-Type: application/json');
-                echo json_encode(['error' => 'Invalid note ID']);
+                echo json_encode(['error' => 'Invalid note ID.']);
                 exit;
             }
 
@@ -73,17 +73,16 @@ try {
                 echo json_encode(['success' => true]);
             } else {
                 header('Content-Type: application/json');
-                echo json_encode(['error' => 'Failed to delete note']);
+                echo json_encode(['error' => 'Failed to delete note.']);
             }
             exit;
         }
     }
 
     // If we get here, it's an invalid request
-    throw new Exception('Invalid request');
+    throw new Exception('Invalid request.');
 } catch (Exception $e) {
     header('Content-Type: application/json');
-    echo json_encode(['error' => $e->getMessage()]);
+    echo json_encode(['error' => 'An error occurred: ' . $e->getMessage()]);
     exit;
 }
-?>
