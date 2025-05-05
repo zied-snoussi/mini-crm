@@ -17,7 +17,7 @@ class Database {
         // Get database configuration from environment variables
         $this->host = Env::get('DB_HOST', 'localhost');
         $this->username = Env::get('DB_USERNAME', 'root');
-        $this->password = Env::get('DB_PASSWORD', '');
+        $this->password = Env::get('DB_PASSWORD', 'root');
         $this->database = Env::get('DB_DATABASE', 'mini_crm');
     }
 
