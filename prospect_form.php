@@ -11,9 +11,10 @@ $success = '';
 
 // Check if editing an existing prospect
 $editing = false;
-if(isset($_GET['id'])) {
-    $prospect->id = $_GET['id'];
-    if($prospect->read_single()) {
+$prospect_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+if ($prospect_id) {
+    $prospect->id = $prospect_id;
+    if ($prospect->read_single()) {
         $editing = true;
     } else {
         header('Location: dashboard.php');
@@ -22,30 +23,30 @@ if(isset($_GET['id'])) {
 }
 
 // Process form submission
-if($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $prospect->name = $_POST['name'] ?? '';
-    $prospect->company = $_POST['company'] ?? '';
-    $prospect->phone = $_POST['phone'] ?? '';
-    $prospect->email = $_POST['email'] ?? '';
-    $prospect->status = $_POST['status'] ?? 'new';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $prospect->name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING) ?? '';
+    $prospect->company = filter_input(INPUT_POST, 'company', FILTER_SANITIZE_STRING) ?? '';
+    $prospect->phone = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_STRING) ?? '';
+    $prospect->email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL) ?? '';
+    $prospect->status = filter_input(INPUT_POST, 'status', FILTER_SANITIZE_STRING) ?? 'new';
     $prospect->user_id = $session->get('user_id');
     
-    if(empty($prospect->name) || empty($prospect->email)) {
-        $error = 'Name and email are required fields';
+    if (empty($prospect->name) || empty($prospect->email)) {
+        $error = 'Name and email are required fields.';
     } else {
-        if($editing) {
-            if($prospect->update()) {
-                $success = 'Prospect updated successfully';
+        if ($editing) {
+            if ($prospect->update()) {
+                $success = 'Prospect updated successfully.';
             } else {
-                $error = 'Failed to update prospect';
+                $error = 'Failed to update prospect.';
             }
         } else {
-            if($prospect->create()) {
-                $success = 'Prospect created successfully';
+            if ($prospect->create()) {
+                $success = 'Prospect created successfully.';
                 // Reset form
                 $prospect = new Prospect();
             } else {
-                $error = 'Failed to create prospect';
+                $error = 'Failed to create prospect.';
             }
         }
     }
@@ -69,12 +70,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <a href="dashboard.php" class="btn btn-secondary">Back to Dashboard</a>
             </div>
             
-            <?php if(!empty($error)): ?>
-                <div class="alert alert-danger"><?php echo $error; ?></div>
+            <?php if (!empty($error)): ?>
+                <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
             
-            <?php if(!empty($success)): ?>
-                <div class="alert alert-success"><?php echo $success; ?></div>
+            <?php if (!empty($success)): ?>
+                <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
             <?php endif; ?>
             
             <form method="POST" class="form">

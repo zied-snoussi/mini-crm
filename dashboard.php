@@ -8,12 +8,13 @@ $session->requireLogin();
 $prospect = new Prospect();
 
 // Default values for pagination
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT) ?? 1;
+$page = max(1, $page); // Ensure page is at least 1
 $limit = 10;
 $offset = ($page - 1) * $limit;
 
 // Get status filter if provided
-$status = isset($_GET['status']) ? $_GET['status'] : null;
+$status = filter_input(INPUT_GET, 'status', FILTER_SANITIZE_STRING) ?? null;
 
 // Get prospects
 $result = $prospect->read($status, $limit, $offset);
@@ -54,10 +55,13 @@ $total_pages = ceil($total_prospects / $limit);
                 <?php include 'views/prospects_table.php'; ?>
             </div>
             
-            <?php if($total_pages > 1): ?>
+            <?php if ($total_pages > 1): ?>
             <div class="pagination">
-                <?php for($i = 1; $i <= $total_pages; $i++): ?>
-                    <a href="?page=<?php echo $i; ?><?php echo $status ? '&status='.$status : ''; ?>" class="<?php echo $page === $i ? 'active' : ''; ?>"><?php echo $i; ?></a>
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                    <a href="?page=<?php echo $i; ?><?php echo $status ? '&status=' . htmlspecialchars($status) : ''; ?>" 
+                       class="<?php echo $page === $i ? 'active' : ''; ?>">
+                        <?php echo $i; ?>
+                    </a>
                 <?php endfor; ?>
             </div>
             <?php endif; ?>
